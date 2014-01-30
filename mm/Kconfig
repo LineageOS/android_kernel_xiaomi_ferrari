@@ -478,6 +478,16 @@ config FRONTSWAP
 
 	  If unsure, say Y to enable frontswap.
 
+<<<<<<< HEAD
+=======
+config ZPOOL
+	tristate "Common API for compressed memory storage"
+	default n
+	help
+	  Compressed memory storage API.  This allows using either zbud or
+	  zsmalloc.
+
+>>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10
 config ZSMALLOC
 	bool "Memory allocator for compressed pages"
 	depends on MMU
@@ -490,6 +500,7 @@ config ZSMALLOC
 	  returned by an alloc().  This handle must be mapped in order to
 	  access the allocated space.
 
+<<<<<<< HEAD
 config PGTABLE_MAPPING
 	bool "Use page table mapping to access object in zsmalloc"
 	depends on ZSMALLOC
@@ -502,6 +513,30 @@ config PGTABLE_MAPPING
 
 	  You can check speed with zsmalloc benchmark[1].
 	  [1] https://github.com/spartacus06/zsmalloc
+=======
+config ZSMALLOC_STAT
+	bool "Export zsmalloc statistics"
+	depends on ZSMALLOC
+	select DEBUG_FS
+	help
+	  This option enables code in the zsmalloc to collect various
+	  statistics about whats happening in zsmalloc and exports that
+	  information to userspace via debugfs.
+	  If unsure, say N.
+
+config PGTABLE_MAPPING
+        bool "Use page table mapping to access object in zsmalloc"
+        depends on ZSMALLOC
+        help
+          By default, zsmalloc uses a copy-based object mapping method to
+          access allocations that span two pages. However, if a particular
+          architecture (ex, ARM) performs VM mapping faster than copying,
+          then you should select this. This causes zsmalloc to use page table
+          mapping rather than copying for object mapping.
+
+          You can check speed with zsmalloc benchmark[1].
+          [1] https://github.com/spartacus06/zsmalloc
+>>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10
 
 config MEMORY_HOLE_CARVEOUT
         bool
