@@ -49,5 +49,5 @@ void pp_print_calib_config_buffer(struct mdp_calib_config_buffer *data,
 				int tab_depth);
 void pp_print_calib_dcm_state(struct mdp_calib_dcm_state *data, int tab_depth);
 void pp_print_mdss_calib_cfg(struct mdss_calib_cfg *data, int tab_depth);
-
+void mdss_pp_input_key_event(struct msm_fb_data_type *mfd, u32 key_code);
 #endif

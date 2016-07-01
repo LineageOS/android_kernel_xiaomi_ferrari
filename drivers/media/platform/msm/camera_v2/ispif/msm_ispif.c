@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -67,16 +67,21 @@ static inline int msm_ispif_is_intf_valid(uint32_t csid_version,
 
 static struct msm_cam_clk_info ispif_8626_reset_clk_info[] = {
 	{"ispif_ahb_clk", NO_SET_RATE},
+	{"camss_top_ahb_clk", NO_SET_RATE},
+	{"csi0_ahb_clk", NO_SET_RATE},
 	{"csi0_src_clk", NO_SET_RATE},
+	{"csi0_phy_clk", NO_SET_RATE},
 	{"csi0_clk", NO_SET_RATE},
 	{"csi0_pix_clk", NO_SET_RATE},
 	{"csi0_rdi_clk", NO_SET_RATE},
+	{"csi1_ahb_clk", NO_SET_RATE},
 	{"csi1_src_clk", NO_SET_RATE},
+	{"csi1_phy_clk", NO_SET_RATE},
 	{"csi1_clk", NO_SET_RATE},
 	{"csi1_pix_clk", NO_SET_RATE},
 	{"csi1_rdi_clk", NO_SET_RATE},
-	{"camss_vfe_vfe0_clk", NO_SET_RATE},
-	{"camss_csi_vfe0_clk", NO_SET_RATE},
+	{"camss_vfe_vfe_clk", NO_SET_RATE},
+	{"camss_csi_vfe_clk", NO_SET_RATE},
 };
 
 static struct msm_cam_clk_info ispif_8974_ahb_clk_info[ISPIF_CLK_INFO_MAX];
@@ -358,23 +363,23 @@ static void msm_ispif_sel_csid_core(struct ispif_device *ispif,
 	switch (intftype) {
 	case PIX0:
 		data &= ~(BIT(1) | BIT(0));
-		data |= (uint32_t)csid;
+		data |= csid;
 		break;
 	case RDI0:
 		data &= ~(BIT(5) | BIT(4));
-		data |= (uint32_t)(csid << 4);
+		data |= (csid << 4);
 		break;
 	case PIX1:
 		data &= ~(BIT(9) | BIT(8));
-		data |= (uint32_t)(csid << 8);
+		data |= (csid << 8);
 		break;
 	case RDI1:
 		data &= ~(BIT(13) | BIT(12));
-		data |= (uint32_t)(csid << 12);
+		data |= (csid << 12);
 		break;
 	case RDI2:
 		data &= ~(BIT(21) | BIT(20));
-		data |= (uint32_t)(csid << 20);
+		data |= (csid << 20);
 		break;
 	}
 
@@ -450,9 +455,9 @@ static void msm_ispif_enable_intf_cids(struct ispif_device *ispif,
 
 	data = msm_camera_io_r(ispif->base + intf_addr);
 	if (enable)
-		data |= (uint32_t)cid_mask;
+		data |= cid_mask;
 	else
-		data &= ~((uint32_t)cid_mask);
+		data &= ~cid_mask;
 	msm_camera_io_w_mb(data, ispif->base + intf_addr);
 }
 
@@ -810,20 +815,9 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 		rc = -EPERM;
 		return rc;
 	}
-	if (params->num > MAX_PARAM_ENTRIES) {
-		pr_err("%s: invalid param entries %d\n", __func__,
-			params->num);
-		rc = -EINVAL;
-		return rc;
-	}
 
 	for (i = 0; i < params->num; i++) {
 		vfe_intf = params->entries[i].vfe_intf;
-		if (vfe_intf >= VFE_MAX) {
-			pr_err("%s: %d invalid i %d vfe_intf %d\n", __func__,
-				__LINE__, i, vfe_intf);
-			return -EINVAL;
-		}
 		vfe_mask |= (1 << vfe_intf);
 	}
 
@@ -1058,11 +1052,7 @@ static void ispif_process_irq(struct ispif_device *ispif,
 
 	if (out[vfe_id].ispifIrqStatus0 &
 			ISPIF_IRQ_STATUS_PIX_SOF_MASK) {
-		if (ispif->ispif_sof_debug < 5)
-			pr_err("%s: PIX0 frame id: %u\n", __func__,
-				ispif->sof_count[vfe_id].sof_cnt[PIX0]);
 		ispif->sof_count[vfe_id].sof_cnt[PIX0]++;
-		ispif->ispif_sof_debug++;
 	}
 	if (out[vfe_id].ispifIrqStatus0 &
 			ISPIF_IRQ_STATUS_RDI0_SOF_MASK) {
@@ -1169,13 +1159,6 @@ static irqreturn_t msm_io_ispif_irq(int irq_num, void *data)
 static int msm_ispif_set_vfe_info(struct ispif_device *ispif,
 	struct msm_ispif_vfe_info *vfe_info)
 {
-	if (!vfe_info || (vfe_info->num_vfe <= 0) ||
-		((uint32_t)(vfe_info->num_vfe) > ispif->hw_num_isps)) {
-		pr_err("Invalid VFE info: %p %d\n", vfe_info,
-			   (vfe_info ? vfe_info->num_vfe:0));
-		return -EINVAL;
-	}
-
 	memcpy(&ispif->vfe_info, vfe_info, sizeof(struct msm_ispif_vfe_info));
 
 	return 0;
@@ -1346,16 +1329,9 @@ static struct v4l2_file_operations msm_ispif_v4l2_subdev_fops;
 static long msm_ispif_subdev_ioctl(struct v4l2_subdev *sd,
 	unsigned int cmd, void *arg)
 {
-	struct ispif_device *ispif =
-		(struct ispif_device *)v4l2_get_subdevdata(sd);
-
 	switch (cmd) {
 	case VIDIOC_MSM_ISPIF_CFG:
 		return msm_ispif_cmd(sd, arg);
-	case MSM_SD_NOTIFY_FREEZE: {
-		ispif->ispif_sof_debug = 0;
-		return 0;
-	}
 	case MSM_SD_SHUTDOWN: {
 		struct ispif_device *ispif =
 			(struct ispif_device *)v4l2_get_subdevdata(sd);

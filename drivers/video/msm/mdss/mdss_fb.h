@@ -176,6 +176,7 @@ struct msm_mdp_interface {
 				const struct mdp_buf_sync *buf_sync);
 	void (*check_dsi_status)(struct work_struct *work, uint32_t interval);
 	int (*configure_panel)(struct msm_fb_data_type *mfd, int mode);
+	void (*pp_key_event_fnc)(struct msm_fb_data_type *mfd, u32 key_code);
 	void *private1;
 };
 
