@@ -77,14 +77,8 @@ enum zram_pageflags {
 /* Allocated for each disk page */
 struct zram_table_entry {
 	unsigned long handle;
-<<<<<<< HEAD:drivers/block/zram/zram_drv.h
-	u16 size;	/* object size (excluding header) */
-	u8 flags;
-} __aligned(4);
-=======
 	unsigned long value;
 };
->>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10:drivers/block/zram/zram_drv.h
 
 struct zram_stats {
 	atomic64_t compr_data_size;	/* compressed size of pages stored */
@@ -97,35 +91,19 @@ struct zram_stats {
 	atomic64_t notify_free;	/* no. of swap slot free notifications */
 	atomic64_t zero_pages;		/* no. of zero filled pages */
 	atomic64_t pages_stored;	/* no. of pages currently stored */
-<<<<<<< HEAD:drivers/block/zram/zram_drv.h
-};
-
-struct zram_meta {
-	rwlock_t tb_lock;	/* protect table */
-	struct table *table;
-=======
 	atomic_long_t max_used_pages;	/* no. of maximum pages stored */
 };
 
 struct zram_meta {
 	struct zram_table_entry *table;
->>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10:drivers/block/zram/zram_drv.h
 	struct zs_pool *mem_pool;
 };
 
 struct zram {
 	struct zram_meta *meta;
-<<<<<<< HEAD:drivers/block/zram/zram_drv.h
-	struct request_queue *queue;
-	struct gendisk *disk;
-	struct zcomp *comp;
-
-	/* Prevent concurrent execution of device init, reset and R/W request */
-=======
 	struct zcomp *comp;
 	struct gendisk *disk;
 	/* Prevent concurrent execution of device init */
->>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10:drivers/block/zram/zram_drv.h
 	struct rw_semaphore init_lock;
 	/*
 	 * the number of pages zram can consume for storing compressed data
@@ -142,11 +120,8 @@ struct zram {
 	 * we can store in a disk.
 	 */
 	u64 disksize;	/* bytes */
-<<<<<<< HEAD:drivers/block/zram/zram_drv.h
 	int max_comp_streams;
 	struct zram_stats stats;
-=======
->>>>>>> d900f3a... (SQUASHED) merge in zram/zsmalloc/zpool from android-3.10:drivers/block/zram/zram_drv.h
 	char compressor[10];
 };
 
