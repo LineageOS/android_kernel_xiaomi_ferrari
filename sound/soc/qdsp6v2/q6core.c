@@ -138,7 +138,6 @@ static int32_t aprv2_core_fn_q(struct apr_client_data *data, void *priv)
 		q6core_lcl.core_handle_q = NULL;
 		break;
 	}
-
 	case AVCS_CMDRSP_ADSP_EVENT_GET_STATE:
 		payload1 = data->payload;
 		q6core_lcl.param = payload1[0];
@@ -658,7 +657,7 @@ static int q6core_alloc_cal(int32_t cal_type,
 {
 	int				ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_alloc_cal(data_size, data,
 		q6core_lcl.cal_data, 0, NULL);
 	if (ret < 0) {
@@ -674,7 +673,7 @@ static int q6core_dealloc_cal(int32_t cal_type,
 {
 	int				ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_dealloc_cal(data_size, data,
 		q6core_lcl.cal_data);
 	if (ret < 0) {
@@ -690,7 +689,7 @@ static int q6core_set_cal(int32_t cal_type,
 {
 	int ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_set_cal(data_size, data,
 		q6core_lcl.cal_data, 0, NULL);
 	if (ret < 0) {
@@ -698,6 +697,7 @@ static int q6core_set_cal(int32_t cal_type,
 		__func__, ret, cal_type);
 		ret = -EINVAL;
 	}
+
 	return ret;
 }
 
