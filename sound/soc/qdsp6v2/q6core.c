@@ -138,7 +138,6 @@ static int32_t aprv2_core_fn_q(struct apr_client_data *data, void *priv)
 		q6core_lcl.core_handle_q = NULL;
 		break;
 	}
-
 	case AVCS_CMDRSP_ADSP_EVENT_GET_STATE:
 		payload1 = data->payload;
 		q6core_lcl.param = payload1[0];
@@ -542,14 +541,7 @@ uint32_t core_set_dolby_manufacturer_id(int manufacturer_id)
 
 	pr_debug("%s: manufacturer_id :%d\n", __func__, manufacturer_id);
 	mutex_lock(&(q6core_lcl.cmd_lock));
-
 	ocm_core_open();
-        if (q6core_lcl.core_handle_q == NULL) {
-                pr_err("%s: apr registration for CORE failed\n", __func__);
-                rc  = -ENODEV;
-                goto fail_cmd;
-        }
-
 	if (q6core_lcl.core_handle_q) {
 		payload.hdr.hdr_field = APR_HDR_FIELD(APR_MSG_TYPE_EVENT,
 			APR_HDR_LEN(APR_HDR_SIZE), APR_PKT_VER);
@@ -571,10 +563,7 @@ uint32_t core_set_dolby_manufacturer_id(int manufacturer_id)
 					__func__, payload.hdr.opcode, rc);
 		}
 	}
-
-fail_cmd:
 	mutex_unlock(&(q6core_lcl.cmd_lock));
-
 	return rc;
 }
 
@@ -668,7 +657,7 @@ static int q6core_alloc_cal(int32_t cal_type,
 {
 	int				ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_alloc_cal(data_size, data,
 		q6core_lcl.cal_data, 0, NULL);
 	if (ret < 0) {
@@ -684,7 +673,7 @@ static int q6core_dealloc_cal(int32_t cal_type,
 {
 	int				ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_dealloc_cal(data_size, data,
 		q6core_lcl.cal_data);
 	if (ret < 0) {
@@ -700,7 +689,7 @@ static int q6core_set_cal(int32_t cal_type,
 {
 	int ret = 0;
 	pr_debug("%s:\n", __func__);
-
+	
 	ret = cal_utils_set_cal(data_size, data,
 		q6core_lcl.cal_data, 0, NULL);
 	if (ret < 0) {
@@ -708,6 +697,7 @@ static int q6core_set_cal(int32_t cal_type,
 		__func__, ret, cal_type);
 		ret = -EINVAL;
 	}
+
 	return ret;
 }
 
